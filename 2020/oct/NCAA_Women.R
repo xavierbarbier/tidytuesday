@@ -1,6 +1,8 @@
 # load libraries
 library(tidyverse)
 library(conflicted)
+library(gganimate)
+library(gifski)
 
 #how to handle overloaded functions
 conflict_prefer("pluck","purrr")
@@ -29,7 +31,7 @@ ncaaw_cum<-tournament%>%
   mutate(conference = str_replace(conference, "–", "-"))
 
 #plot 
-ggplot(data = ncaaw_cum) +
+animate_plot <- ggplot(data = ncaaw_cum) +
   geom_line(aes(x = year, y = cum_wins, colour = conference), size = 2) + 
   scale_y_continuous(breaks = seq(0, max(ncaaw_cum$cum_wins), len = 2)) + 
   theme_minimal()+  
@@ -46,5 +48,9 @@ ggplot(data = ncaaw_cum) +
         plot.title = element_text(size = 20),
         plot.subtitle = element_text(size = 15),
         plot.caption = element_text(size = 10, face = "bold"),
-        plot.margin = margin(2, 2, 2, 2, "cm"))
-  
+        plot.margin = margin(2, 2, 2, 2, "cm"))+ 
+    transition_reveal(year)
+
+animate(animate_plot,end_pause = 12,duration = 12, fps = 20, width = 1366, height = 657, renderer = gifski_renderer())
+
+anim_save("output.gif")
